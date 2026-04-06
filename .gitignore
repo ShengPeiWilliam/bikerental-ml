@@ -49,3 +49,10 @@ po/*~
 rsconnect/
 
 data/
+
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.out
