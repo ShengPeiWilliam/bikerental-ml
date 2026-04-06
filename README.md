@@ -5,18 +5,19 @@ Daily bike rental demand forecasting using the UCI Bike Sharing Dataset (731 obs
 - Feature removal: target leakage detection, correlation screening ($r = 0.99$), aliased variable identification
 - Multicollinearity assessment via VIF
 - OLS coefficient analysis with t-statistics and significance testing
-- Regularisation comparison: Ridge (L2) and Lasso (L1) with lambda tuned by cross-validation
+- Regularisation comparison: Ridge (L2) and Lasso (L1) with lambda tuned by cross-validation within each training window
 - Residual diagnostics: Residuals vs Fitted, Q-Q plot, Scale-Location, Cook's Distance
-- 5-fold cross-validation with caret and glmnet
+- Rolling-origin cross-validation (5 expanding windows) for out-of-sample RMSE and MAE
+- Model comparison: CV RMSE, CV MAE, R²
 
 ## Tools
-R &bull; caret &bull; glmnet &bull; ggplot2 &bull; corrplot &bull; car &bull; tidyr
+R &bull; glmnet &bull; caret &bull; ggplot2 &bull; corrplot &bull; car &bull; tidyr
 
 ## Repository
 - `report/bikerental_report.tex` &mdash; LaTeX source file
 - `report/bikerental_report.pdf` &mdash; Final report
 - `code/bikerental_analysis.ipynb` &mdash; Main analysis notebook
-- `code/bikerental_analysis.R` &mdash; Clean R script version of the analysis  
+- `code/bikerental_analysis.R` &mdash; Clean R script version of the analysis
 - `code/config.R` &mdash; Configuration file (data paths)
 
 ## References
