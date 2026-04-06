@@ -224,3 +224,58 @@ lasso.r2 <- 1 - sum((y - lasso.pred)^2) / sum((y - mean(y))^2)
 cat("OLS   R²:", summary(lm.model$finalModel)$r.squared, "\n")
 cat("Ridge R²:", ridge.r2, "\n")
 cat("Lasso R²:", lasso.r2, "\n")
+
+# ---- Out-of-Sample Evaluation (Rolling-Origin CV) ----
+make_X <- function(data) {
+  model.matrix(cnt ~ season + yr + weekday + holiday +
+                 temp + hum + windspeed + weathersit,
+               data = data)[, -1]
+}
+
+train_sizes <- floor(seq(0.6, 0.9, length.out = 5) * nrow(bike.data))
+
+cv.results.ols <- sapply(train_sizes, function(n) {
+  train.data <- bike.data[1:n, ]
+  test.data  <- bike.data[(n+1):nrow(bike.data), ]
+  fit  <- lm(cnt ~ season + yr + weekday + holiday +
+               temp + hum + windspeed + weathersit,
+             data = train.data)
+  pred <- predict(fit, newdata = test.data)
+  c(RMSE = sqrt(mean((test.data$cnt - pred)^2)),
+    MAE  = mean(abs(test.data$cnt - pred)))
+})
+
+cv.results.ridge <- sapply(train_sizes, function(n) {
+  train.data <- bike.data[1:n, ]
+  test.data  <- bike.data[(n+1):nrow(bike.data), ]
+  X.train <- make_X(train.data)
+  X.test  <- make_X(test.data)
+  lambda  <- cv.glmnet(X.train, train.data$cnt, alpha = 0)$lambda.min
+  fit     <- glmnet(X.train, train.data$cnt, alpha = 0, lambda = lambda)
+  pred    <- predict(fit, newx = X.test)
+  c(RMSE = sqrt(mean((test.data$cnt - pred)^2)),
+    MAE  = mean(abs(test.data$cnt - pred)))
+})
+
+cv.results.lasso <- sapply(train_sizes, function(n) {
+  train.data <- bike.data[1:n, ]
+  test.data  <- bike.data[(n+1):nrow(bike.data), ]
+  X.train <- make_X(train.data)
+  X.test  <- make_X(test.data)
+  lambda  <- cv.glmnet(X.train, train.data$cnt, alpha = 1)$lambda.min
+  fit     <- glmnet(X.train, train.data$cnt, alpha = 1, lambda = lambda)
+  pred    <- predict(fit, newx = X.test)
+  c(RMSE = sqrt(mean((test.data$cnt - pred)^2)),
+    MAE  = mean(abs(test.data$cnt - pred)))
+})
+
+result.cv <- data.frame(
+  Model   = c("OLS", "Ridge", "Lasso"),
+  CV_RMSE = round(c(mean(cv.results.ols["RMSE", ]),
+                    mean(cv.results.ridge["RMSE", ]),
+                    mean(cv.results.lasso["RMSE", ])), 3),
+  CV_MAE  = round(c(mean(cv.results.ols["MAE", ]),
+                    mean(cv.results.ridge["MAE", ]),
+                    mean(cv.results.lasso["MAE", ])), 3)
+)
+print(result.cv, row.names = FALSE)
