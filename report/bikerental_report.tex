@@ -9,7 +9,8 @@
 
 \title{
     \vspace{-1cm}
-    \Large\textbf{Bike Sharing Demand Forecasting:\\OLS, Ridge, and Lasso Analysis}
+    \Large\textbf{Bike Sharing Demand Forecasting:\\[0.3em]
+    An OLS, Ridge, and Lasso Regression Analysis}
 }
 \author{
     William Chen
@@ -24,19 +25,23 @@
 \begin{abstract}
 This report analyses daily bike rental demand using the UCI Bike Sharing
 Dataset, comprising 731 observations collected from the Capital Bikeshare
-system in Washington, D.C. between 2011 and 2012. We apply Ordinary Least Squares (OLS) regression as the primary model,
-and compare it against Ridge and Lasso regression to evaluate the effect
-of regularisation. Following careful feature selection and
-multicollinearity diagnostics, the final model is trained on 8 predictors
-spanning temporal, weather, and calendar dimensions.
- 
-The OLS model achieves an in-sample $R^2$ of 0.827 and a 5-fold
-cross-validated RMSE of 821, outperforming Ridge (835) and Lasso (831).
-Year and temperature emerge as the strongest predictors. Residual
-diagnostics confirm that linear model assumptions are largely satisfied,
-with only mild heteroscedasticity observed at higher fitted values.
+system in Washington, D.C. between 2011 and 2012. We apply Ordinary Least
+Squares (OLS) regression as the primary model, and compare it against
+Ridge and Lasso regression to evaluate the effect of regularisation.
+Following careful feature selection and multicollinearity diagnostics, the
+final model is trained on 8 predictors spanning temporal, weather, and
+calendar dimensions.
+
+The OLS model achieves an in-sample $R^2$ of 0.827. Rolling-origin
+cross-validation yields a CV RMSE of 1166 and MAE of 890 for OLS,
+outperforming Lasso (1170 / 893) and Ridge (1229 / 969). Year and
+temperature emerge as the strongest predictors. Residual diagnostics
+confirm that linear model assumptions are largely satisfied, with only
+mild heteroscedasticity observed at higher fitted values.
+
 \end{abstract}
 \newpage
+
 %-----------------------------------------------------------------------
 \section{Introduction}
 
@@ -59,7 +64,8 @@ well-specified feature set. Through exploratory data analysis, correlation
 screening, and variance inflation factor (VIF) diagnostics, we carefully
 remove redundant and aliased predictors before modelling. We further assess
 the validity of linear model assumptions using residual diagnostics, and
-report 5-fold cross-validated RMSE as the primary evaluation metric.
+report rolling-origin cross-validated RMSE and MAE as the primary
+evaluation metrics.
 
 %-----------------------------------------------------------------------
 \section{Data}
@@ -77,8 +83,11 @@ excluded from analysis), 1 continuous target (\textit{cnt}), and 13 predictors.
 Features span temporal (\textit{season}, \textit{yr}, \textit{mnth}, \textit{holiday},
 \textit{weekday}, \textit{workingday}), weather (\textit{weathersit}, \textit{temp},
 \textit{atemp}, \textit{hum}, \textit{windspeed}), and usage (\textit{casual},
-\textit{registered}) dimensions. Among the 13 predictors, 6 are categorical and
-5 are continuous.
+\textit{registered}) dimensions. 
+
+Of these 13 predictors, 7 are categorical and 6 are continuous.
+Two (\textit{casual}, \textit{registered}) are excluded from modelling
+due to target leakage, leaving 11 predictors for analysis.
 
 \subsection{Feature Selection and Preprocessing}
 Prior to modelling, four variables were removed from the dataset.
@@ -112,10 +121,11 @@ likely reflecting the higher overall demand in 2012 compared to 2011.
 \subsubsection{Categorical Features}
 
 Figures~\ref{fig:boxplot_season} and~\ref{fig:boxplot_month} show
-consistent seasonal trends: counts peak during summer (months 6--9) and
-drop substantially in winter (months 1--2), with spring and fall occupying
-intermediate levels. The two plots convey near-identical distributional
-patterns, reflecting the strong overlap between the two variables.
+consistent seasonal trends: counts peak in Summer, followed by Spring
+and Fall, while Winter records the lowest demand. The two plots convey
+near-identical distributional patterns, reflecting the strong overlap
+between the two variables.
+
 Figure~\ref{fig:boxplot_yr} shows a marked increase in overall demand from
 2011 (Year 0) to 2012 (Year 1), with the median rising from approximately
 3,500 to 6,200. A small number of outliers are visible across all three
@@ -221,9 +231,7 @@ action.
 \subsection{Ordinary Least Squares (OLS)}
 Ordinary Least Squares regression was selected as the primary model for
 its interpretability, providing coefficient estimates that directly
-quantify the effect of each predictor on daily rental counts. The model
-was trained using 5-fold cross-validation to obtain a reliable estimate
-of out-of-sample performance.
+quantify the effect of each predictor on daily rental counts.
  
 \subsection{Regularisation}
 
@@ -231,21 +239,23 @@ of out-of-sample performance.
 Ridge regression extends OLS by adding an L2 penalty on the magnitude of
 coefficients, shrinking them towards zero to reduce variance. It retains
 all predictors in the model and is particularly useful when predictors
-are correlated. The penalty strength $\lambda$ was selected via 5-fold
-cross-validation.
- 
+are correlated. The penalty strength $\lambda$ was selected via
+cross-validation within each training window.
+
 \paragraph{Lasso Regression}
 Lasso regression applies an L1 penalty, which can shrink some
 coefficients to exactly zero, effectively performing feature selection.
-Both regularised models use the same cross-validation procedure for
-$\lambda$ selection, and serve as a comparison against OLS to evaluate
-whether penalisation offers any predictive gain under the current feature
-set.
+The same $\lambda$ selection procedure is applied, and both regularised
+models serve as a comparison against OLS to evaluate whether
+penalisation offers any predictive gain under the current feature set.
+
 
 \subsection{Evaluation Metrics}
-All three models were evaluated using 5-fold cross-validated RMSE as the
-primary metric, and $R^2$ as a supplementary measure of explained
-variance. The final models were trained on 8 predictors.
+All three models were fitted on the full dataset and reported with
+in-sample $R^2$. Rolling-origin cross-validation was used to obtain
+out-of-sample estimates of predictive performance, reported as CV RMSE
+and CV MAE. The final models were trained on 8 predictors.
+
 %-----------------------------------------------------------------------
 \section{Assumption Diagnostics}
  
@@ -331,7 +341,7 @@ observations, within an acceptable range.
 
 \subsection{OLS Coefficient Estimates}
  
-The OLS model was trained on all 731 observations, achieving an in-sample
+The OLS model was fitted on all 731 observations, achieving an in-sample
 $R^2$ of 0.827 and an adjusted $R^2$ of 0.824, indicating that
 approximately 82\% of the variance in daily rentals is explained by the
 predictors.
@@ -350,23 +360,22 @@ meaningfully from the Sunday baseline.
 \subsection{Model Comparison}
 
 Table~\ref{tab:model_compare} compares the three models using
-5-fold cross-validated RMSE as the primary metric. OLS achieves the
-lowest CV RMSE of 821, outperforming Lasso (831) and Ridge (835).
-The marginal difference suggests that regularisation offers limited
-improvement when the feature set is already well-specified.
- 
+rolling-origin cross-validated RMSE and MAE. OLS achieves the lowest
+CV RMSE (1166) and MAE (890), followed by Lasso (1170 / 893) and Ridge
+(1229 / 969).
+
 \begin{table}[H]
 \centering
-\caption{Model comparison. CV RMSE is out-of-sample (5-fold
-cross-validation); $R^2$ is in-sample.}
+\caption{Rolling-origin cross-validated performance. CV RMSE and CV MAE
+are out-of-sample.}
 \label{tab:model_compare}
 \begin{tabular}{lrr}
 \toprule
-\textbf{Model} & \textbf{CV RMSE} & \textbf{$R^2$} \\
+\textbf{Model} & \textbf{CV RMSE} & \textbf{CV MAE} \\
 \midrule
-OLS   & 821.99 & 0.827 \\
-Lasso & 831.18 & 0.827 \\
-Ridge & 834.62 & 0.824 \\
+OLS   & 1166.398 & 889.573 \\
+Lasso & 1169.791 & 893.448 \\
+Ridge & 1229.090 & 968.916 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -376,32 +385,42 @@ Ridge & 834.62 & 0.824 \\
 \section{Discussion}
 
 \subsection{Key Findings}
-
- 
 The OLS model explains approximately 82\% of the variance in daily bike
 rentals, with all predictors significant except \textit{weekday1}.
-Among all predictors, \textit{yr} emerges as the dominant predictor, capturing a substantial
-year-over-year growth in demand from 2011 to 2012. However, this
-coefficient reflects a service growth trend rather than a stable seasonal
-or behavioural pattern, and may not generalise beyond the observation
-period. \textit{temp} is the strongest continuous predictor, reinforcing
-the central role of weather conditions in driving rental demand. The
-comparison across models shows that OLS outperforms both Ridge and Lasso
-on CV RMSE (821 vs 831 vs 835), suggesting that regularisation offers
-limited benefit when the feature set is already well-specified through
-careful preprocessing.
+Among all predictors, \textit{yr} emerges as the dominant predictor,
+capturing a substantial year-over-year growth in demand from 2011 to
+2012. However, this coefficient reflects a service growth trend rather
+than a stable seasonal or behavioural pattern, and may not generalise
+beyond the observation period. \textit{temp} is the strongest continuous
+predictor, reinforcing the central role of weather conditions in driving
+rental demand.
+
+Rolling-origin cross-validation confirms that OLS outperforms both Lasso
+and Ridge (CV RMSE: 1166 vs 1170 vs 1229), suggesting that
+regularisation offers limited benefit when the feature set is already
+well-specified through careful preprocessing. This ordering is consistent
+with an earlier 5-fold evaluation (RMSE: 822 vs 824 vs 831), suggesting
+the conclusion is robust to the choice of CV scheme.
 
 \subsection{Limitations}
-
-Three limitations are worth noting. First, the model covers only two
-years of data, and the large \textit{yr} coefficient may reflect a
-growth phase specific to that period rather than a persistent trend,
+\paragraph{Data limitations.}
+Two limitations stem from the dataset itself. First, the model covers
+only two years of data, and the large \textit{yr} coefficient may reflect
+a growth phase specific to that period rather than a persistent trend,
 limiting the model's predictive validity for future years. Second,
 prediction errors are likely larger on days with extreme weather
 conditions, as such events are rare in the dataset and poorly represented
-during training. Third, the model does not include interaction terms,
-such as between \textit{temp} and \textit{season}, which may capture
-more nuanced demand dynamics and improve predictive performance.
+during training.
+
+\paragraph{Methodological limitations.}
+Two limitations concern model specification. First, OLS assumes a
+continuous, normally distributed response; however, daily rental counts
+are non-negative integers, and a count regression model such as Poisson
+or Negative Binomial may be more appropriate for this response type.
+Second, the model does not include interaction terms, such as between
+\textit{temp} and \textit{season}, which may capture more nuanced demand
+dynamics and improve predictive performance.
+
 
 \begin{thebibliography}{9}
  
