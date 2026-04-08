@@ -36,11 +36,12 @@ Year and temperature are the strongest predictors. Residual diagnostics confirm 
 
 The main takeaway: on a small, well-understood dataset, a carefully specified OLS model is hard to beat. Regularization didn't help here because the real work, removing leakage, handling multicollinearity, and selecting meaningful features, was already done before the model saw any data. This reinforced that feature engineering discipline matters more than model complexity at this scale.
 
-**Next steps**
+That said, the `yr` effect may only reflect a 2011–2012 growth phase, and predictions on extreme weather days are less reliable due to sparse training data.
 
-- **Count regression**: OLS assumes a continuous, normally distributed response. Moving to Poisson or Negative Binomial regression better fits the non-negative integer nature of rental counts. See [bikerental-poisson](https://github.com/ShengPeiWilliam/bikerental-poisson) for a follow-up applying this approach to the same dataset.
-- **Nonlinear patterns**: residual plots hint at curvature that a linear model can't capture. Adding interaction terms or polynomial features could close that gap without abandoning interpretability.
-- **Time-series structure**: the current approach treats each day independently. Incorporating lagged demand or day-of-week effects would better reflect how bike usage actually behaves.
+Next steps:
+- **Count regression** — OLS assumes a continuous, normally distributed response, but rental counts are non-negative integers. Poisson or Negative Binomial regression better fits the data's nature. See [bikerental-poisson](https://github.com/ShengPeiWilliam/bikerental-poisson) for a follow-up applying this approach to the same dataset.
+- **Temporal structure** — the model treats each day independently. Incorporating lagged demand or autoregressive terms would better reflect how bike usage actually behaves.
+- **Interaction effects** — temperature likely behaves differently across seasons. Adding interaction terms could capture these dynamics without abandoning interpretability.
 
 ## Repository
 
