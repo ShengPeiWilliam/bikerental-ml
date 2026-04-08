@@ -1,26 +1,58 @@
 # Bike Sharing Demand Forecasting
-Daily bike rental demand forecasting using the UCI Bike Sharing Dataset (731 observations, 2011–2012). Applies Ordinary Least Squares regression as the primary model with careful feature selection, multicollinearity diagnostics, and residual assumption checks. Compares OLS against Ridge and Lasso regression to evaluate whether regularisation offers predictive gains under a well-specified feature set.
 
-## Key Techniques
-- Feature removal: target leakage detection, correlation screening ($r = 0.99$), aliased variable identification
-- Multicollinearity assessment via VIF
-- OLS coefficient analysis with t-statistics and significance testing
-- Regularisation comparison: Ridge (L2) and Lasso (L1) with lambda tuned by cross-validation within each training window
-- Residual diagnostics: Residuals vs Fitted, Q-Q plot, Scale-Location, Cook's Distance
-- Rolling-origin cross-validation (5 expanding windows) for out-of-sample RMSE and MAE
-- Model comparison: CV RMSE, CV MAE, R²
+Daily bike rental demand forecasting using OLS regression on the UCI Bike Sharing Dataset (731 observations, Washington D.C., 2011–2012). Compares OLS against Ridge and Lasso to test whether regularization improves predictions when the feature set is already well-specified.
 
-## Tools
-R &bull; glmnet &bull; caret &bull; ggplot2 &bull; corrplot &bull; car &bull; tidyr
+## Motivation
+
+Most forecasting write-ups skip straight to gradient boosting or neural nets. This project goes the other direction: how far can a carefully constructed linear model go? The UCI Bike Sharing Dataset is small and well-documented enough to focus on the statistical fundamentals: feature selection, assumption checking, and honest evaluation, without infrastructure getting in the way.
+
+## Design Decisions
+
+**Why OLS instead of gradient boosting or neural nets?**
+
+The goal was to understand what drives bike rental demand, not just predict it. OLS gives interpretable coefficients with significance tests: you can say "temperature increases demand by X units, controlling for season and weather" in a way that a black-box model can't. Starting simple also makes it easy to tell whether added complexity actually helps.
+
+**Why compare against Ridge and Lasso?**
+
+To test a specific hypothesis: if feature selection is done carefully upfront (removing leakage, aliased variables, and high-VIF predictors), does regularization still add value? The answer turned out to be no. OLS matched or beat both regularized models, suggesting that thoughtful feature engineering can substitute for algorithmic complexity on small, clean datasets.
+
+**How were features selected?**
+
+The raw dataset contains variables that leak the target (casual + registered = total count). Catching this early was critical. Beyond that, correlation screening (r = 0.99 between `temp` and `atemp`) and VIF-based removal brought the feature set down to 8 predictors spanning temporal, weather, and calendar dimensions.
+
+## Key Results
+
+The OLS model achieves an in-sample R² of 0.827. Rolling-origin cross-validation (5 expanding windows) gives a clearer picture of real performance:
+
+| Model | CV RMSE | CV MAE |
+|-------|---------|--------|
+| **OLS** | **1166** | **890** |
+| Lasso | 1170 | 893 |
+| Ridge | 1229 | 969 |
+
+Year and temperature are the strongest predictors. Residual diagnostics confirm that linear model assumptions are largely met, with only mild heteroscedasticity at higher fitted values.
+
+## Reflections & Next Steps
+
+The main takeaway: on a small, well-understood dataset, a carefully specified OLS model is hard to beat. Regularization didn't help here because the real work, removing leakage, handling multicollinearity, and selecting meaningful features, was already done before the model saw any data. This reinforced that feature engineering discipline matters more than model complexity at this scale.
+
+**Next steps**
+
+- **Count regression**: OLS assumes a continuous, normally distributed response. Moving to Poisson or Negative Binomial regression better fits the non-negative integer nature of rental counts. See [bikerental-poisson](https://github.com/ShengPeiWilliam/bikerental-poisson) for a follow-up applying this approach to the same dataset.
+- **Nonlinear patterns**: residual plots hint at curvature that a linear model can't capture. Adding interaction terms or polynomial features could close that gap without abandoning interpretability.
+- **Time-series structure**: the current approach treats each day independently. Incorporating lagged demand or day-of-week effects would better reflect how bike usage actually behaves.
 
 ## Repository
-- `report/bikerental_report.tex` &mdash; LaTeX source file
-- `report/bikerental_report.pdf` &mdash; Final report
-- `code/bikerental_analysis.ipynb` &mdash; Main analysis notebook
-- `code/bikerental_analysis.R` &mdash; Clean R script version of the analysis
-- `code/config.R` &mdash; Configuration file (data paths)
+
+- `report/bikerental_report.pdf`: Final report
+- `code/bikerental_analysis.ipynb`: Main analysis notebook
+- `code/bikerental_analysis.R`: Clean R script version
+- `code/config.R`: Configuration file (data paths)
+
+## Tools
+
+R, glmnet, caret, ggplot2, corrplot, car, tidyr
 
 ## References
 
-Fanaee-T, H. (2013). Bike Sharing [Dataset]. UCI Machine Learning Repository.
-https://doi.org/10.24432/C5W894
+Fanaee-T, H. (2013). Bike Sharing [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5W894
