@@ -23,11 +23,11 @@
 
 %-----------------------------------------------------------------------
 \begin{abstract}
-This report analyses daily bike rental demand using the UCI Bike Sharing
+This report analyzes daily bike rental demand using the UCI Bike Sharing
 Dataset, comprising 731 observations collected from the Capital Bikeshare
 system in Washington, D.C. between 2011 and 2012. We apply Ordinary Least
 Squares (OLS) regression as the primary model, and compare it against
-Ridge and Lasso regression to evaluate the effect of regularisation.
+Ridge and Lasso regression to evaluate the effect of regularization.
 Following careful feature selection and multicollinearity diagnostics, the
 final model is trained on 8 predictors spanning temporal, weather, and
 calendar dimensions.
@@ -48,21 +48,21 @@ mild heteroscedasticity observed at higher fitted values.
 Bike-sharing systems have become an increasingly popular form of urban
 transportation, offering a flexible and environmentally friendly alternative
 to private vehicles. Accurately forecasting daily rental demand is valuable
-for operators seeking to optimise fleet distribution, staffing, and
+for operators seeking to optimize fleet distribution, staffing, and
 infrastructure planning. Demand is inherently influenced by a combination
 of weather conditions, seasonal patterns, and calendar effects, making it a
-well-suited problem for regression modelling.
+well-suited problem for regression modeling.
 
-This project analyses daily bike rental counts using the UCI Bike Sharing
+This project analyzes daily bike rental counts using the UCI Bike Sharing
 Dataset, which records 731 days of rental activity across 2011 and 2012 in
 Washington D.C. The dataset contains weather measurements, temporal
 indicators, and usage statistics collected by the Capital Bikeshare system.
 We apply Ordinary Least Squares (OLS) regression as the primary model for
 its interpretability, and compare it against Ridge and Lasso regression to
-evaluate whether regularisation offers predictive gains under a
+evaluate whether regularization offers predictive gains under a
 well-specified feature set. Through exploratory data analysis, correlation
 screening, and variance inflation factor (VIF) diagnostics, we carefully
-remove redundant and aliased predictors before modelling. We further assess
+remove redundant and aliased predictors before modeling. We further assess
 the validity of linear model assumptions using residual diagnostics, and
 report rolling-origin cross-validated RMSE and MAE as the primary
 evaluation metrics.
@@ -86,11 +86,11 @@ Features span temporal (\textit{season}, \textit{yr}, \textit{mnth}, \textit{hol
 \textit{registered}) dimensions. 
 
 Of these 13 predictors, 7 are categorical and 6 are continuous.
-Two (\textit{casual}, \textit{registered}) are excluded from modelling
+Two (\textit{casual}, \textit{registered}) are excluded from modeling
 due to target leakage, leaving 11 predictors for analysis.
 
 \subsection{Feature Selection and Preprocessing}
-Prior to modelling, four variables were removed from the dataset.
+Prior to modeling, four variables were removed from the dataset.
 \textit{instant} and \textit{dteday} are excluded as they serve purely as
 a record index and a date string respectively, carrying no predictive
 information. \textit{casual} and \textit{registered} are excluded due to
@@ -233,7 +233,7 @@ Ordinary Least Squares regression was selected as the primary model for
 its interpretability, providing coefficient estimates that directly
 quantify the effect of each predictor on daily rental counts.
  
-\subsection{Regularisation}
+\subsection{Regularization}
 
 \paragraph{Ridge Regression}
 Ridge regression extends OLS by adding an L2 penalty on the magnitude of
@@ -245,9 +245,9 @@ cross-validation within each training window.
 \paragraph{Lasso Regression}
 Lasso regression applies an L1 penalty, which can shrink some
 coefficients to exactly zero, effectively performing feature selection.
-The same $\lambda$ selection procedure is applied, and both regularised
+The same $\lambda$ selection procedure is applied, and both regularized
 models serve as a comparison against OLS to evaluate whether
-penalisation offers any predictive gain under the current feature set.
+penalization offers any predictive gain under the current feature set.
 
 
 \subsection{Evaluation Metrics}
@@ -296,7 +296,7 @@ transformation.
  
 \subsection{Scale-Location}
 
-Figure~\ref{fig:scale_loc} plots the square root of standardised residuals
+Figure~\ref{fig:scale_loc} plots the square root of standardized residuals
 against fitted values to assess homoscedasticity. The red trend line shows
 a slight upward slope, indicating that residual variance increases mildly
 at higher fitted values. This is consistent with the pattern observed in
@@ -390,14 +390,14 @@ rentals, with all predictors significant except \textit{weekday1}.
 Among all predictors, \textit{yr} emerges as the dominant predictor,
 capturing a substantial year-over-year growth in demand from 2011 to
 2012. However, this coefficient reflects a service growth trend rather
-than a stable seasonal or behavioural pattern, and may not generalise
+than a stable seasonal or behavioral pattern, and may not generalize
 beyond the observation period. \textit{temp} is the strongest continuous
 predictor, reinforcing the central role of weather conditions in driving
 rental demand.
 
 Rolling-origin cross-validation confirms that OLS outperforms both Lasso
 and Ridge (CV RMSE: 1166 vs 1170 vs 1229), suggesting that
-regularisation offers limited benefit when the feature set is already
+regularization offers limited benefit when the feature set is already
 well-specified through careful preprocessing. This ordering is consistent
 with an earlier 5-fold evaluation (RMSE: 822 vs 824 vs 831), suggesting
 the conclusion is robust to the choice of CV scheme.
