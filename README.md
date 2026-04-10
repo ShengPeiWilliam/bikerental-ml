@@ -35,9 +35,9 @@ The OLS model achieves an in-sample R² of 0.827. Rolling-origin cross-validatio
 On a small, well-understood dataset, a carefully specified OLS model is hard to beat. That said, the model has clear boundaries. The `yr` effect may only reflect a 2011–2012 growth phase, and predictions on extreme weather days are less reliable due to sparse training data.
 
 Next steps:
-- **Count regression** — OLS assumes a continuous, normally distributed response, but rental counts are non-negative integers. Poisson or Negative Binomial regression better fits the data's nature. See [bikerental-poisson](https://github.com/ShengPeiWilliam/bikerental-poisson) for a follow-up applying this approach to the same dataset.
-- **Temporal structure** — the model treats each day independently. Incorporating lagged demand or autoregressive terms would better reflect how bike usage actually behaves.
-- **Interaction effects** — temperature likely behaves differently across seasons. Adding interaction terms could capture these dynamics without abandoning interpretability.
+- **Count regression**: OLS assumes a continuous, normally distributed response, but rental counts are non-negative integers. Poisson or Negative Binomial regression better fits the data's nature. See [bikerental-poisson](https://github.com/ShengPeiWilliam/bikerental-poisson) for a follow-up applying this approach to the same dataset.
+- **Temporal structure**: the model treats each day independently. Incorporating lagged demand or autoregressive terms would better reflect how bike usage actually behaves.
+- **Interaction effects**: temperature likely behaves differently across seasons. Adding interaction terms could capture these dynamics without abandoning interpretability.
 
 ## Repository
 
@@ -52,4 +52,4 @@ R, glmnet, caret, ggplot2, corrplot, car, tidyr
 
 ## References
 
-Fanaee-T, H. (2013). Bike Sharing [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5W894 — dataset source, 731 daily observations from the Capital Bikeshare system in Washington D.C., 2011–2012.
+Fanaee-T, H. (2013). Bike Sharing [Dataset]. UCI Machine Learning Repository. doi:10.24432/C5W894
