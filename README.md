@@ -1,4 +1,4 @@
-# Bike Sharing Demand Forecasting
+# Bike Sharing Demand Forecasting (OLS)
 
 Daily bike rental demand forecasting using OLS regression on the UCI Bike Sharing Dataset (731 observations, Washington D.C., 2011–2012). Year and temperature are the strongest predictors. Compares OLS against Ridge and Lasso, with OLS achieving CV RMSE of 1,166 and R² of 0.827, outperforming both regularized models.
 
